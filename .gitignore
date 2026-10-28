@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+.booking-qa/
+.visual-qa/
+.motion-qa/
