@@ -1,2 +1,3 @@
-// Production builds keep the original coming-soon behavior unless explicitly enabled.
-export const bookingPreviewEnabled = import.meta.env.VITE_BOOKING_PREVIEW === undefined ? import.meta.env.DEV : import.meta.env.VITE_BOOKING_PREVIEW === 'true';
+// The mock booking preview is available in every environment unless explicitly disabled.
+// This controls access to the preview, never live reservations or payments.
+export const bookingPreviewEnabled = import.meta.env.VITE_BOOKING_PREVIEW !== 'false';

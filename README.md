@@ -7,7 +7,7 @@ npm install
 npm run dev
 ```
 
-Run `npm run build` for a production build. Booking buttons open a clearly labeled six-step preview in development; production retains the coming-soon notice unless the preview flag is explicitly enabled. See [booking preview documentation](docs/booking-preview.md) for configuration, architecture, tests, and future integration requirements.
+Run `npm run build` for a production build and `npm run preview` to test it locally. Booking buttons open the same clearly labeled six-step mock preview in development and production, including Vercel. Only an explicit `VITE_BOOKING_PREVIEW=false` build-time flag disables access; no real appointments, payments, or confirmations are created. See [booking preview documentation](docs/booking-preview.md) for configuration, architecture, tests, and future integration requirements.
 
 The desktop layout follows the 1440px Figma frame. Supplied photos are imported from the project root because they match the Figma fills pixel for pixel. Additional Figma assets are stored in `public/assets/figma`.
 

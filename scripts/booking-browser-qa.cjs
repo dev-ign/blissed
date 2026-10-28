@@ -19,6 +19,9 @@ async function open(page) {
   await page.getByRole('button', { name: 'Book Your Massage', exact: true }).click();
   await step(page, 0);
   await page.waitForFunction(() => document.querySelector('.booking-dialog')?.open);
+  assert.equal(await page.getByText('Online booking is coming soon.', { exact: true }).count(), 0, 'Booking fell back to the obsolete production placeholder');
+  assert.equal(await page.locator('dialog[open]').count(), 1, 'Expected a single booking instance');
+  assert.equal(await page.getByRole('dialog', { name: 'Create your Blissed massage booking preview', exact: true }).count(), 1, 'Dialog accessible label missing');
 }
 async function selectService(page, id) { await page.locator('.booking-service-option').filter({ has: page.locator(`input[value="${id}"]`) }).click(); }
 async function capture(page, name) { await page.locator('.booking-dialog').evaluate(async dialog => { await Promise.allSettled([...dialog.querySelectorAll('img')].map(i=>i.decode())); }); await page.screenshot({ path: path.join(output, `${name}.png`) }); }
@@ -125,6 +128,12 @@ async function enlargeText(page) {
    assert.deepEqual(errors,[]);await page.close();console.log(`PASS ${width} × ${height}: all six steps and completion`);
   }
   // Contextual CTA routing, fresh journeys, focus wrapping, and discard behavior.
+  const desktop=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
+  await desktop.goto(baseURL);
+  for(const trigger of [desktop.locator('.desktop-nav').getByRole('button',{name:'Book a Massage',exact:true}),desktop.getByRole('button',{name:'Book your session',exact:true}),desktop.getByRole('button',{name:'Request Event Availability',exact:true})]){
+   await trigger.click();await step(desktop,0);assert.equal(await desktop.locator('dialog[open]').count(),1);assert.equal(await desktop.locator('.booking-notice').count(),0);await desktop.keyboard.press('Escape');await desktop.waitForFunction(()=>!document.querySelector('dialog[open]'));assert.equal(await trigger.evaluate(el=>el===document.activeElement),true);assert.notEqual(await desktop.evaluate(()=>document.body.style.overflow),'hidden');
+  }
+  await desktop.close();
   const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});await page.goto(baseURL);
   for(const [index,id] of ['reset','deep-restore','active-recovery','prenatal','your-way'].entries()){
    await page.locator('.service-card').nth(index).getByRole('button').click();await step(page,0);assert.equal(await page.locator('input[name=experience]:checked').inputValue(),id);await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
@@ -150,7 +159,7 @@ async function enlargeText(page) {
   await page.locator('.booking-footer button[type=submit]').focus();await page.keyboard.press('Enter');await step(page,2);await location(page);await next(page,3);
   await page.locator('.booking-calendar-cell button:not(:disabled)').first().focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('Enter');await page.locator('.booking-time-grid .booking-tile').first().waitFor();await page.locator('input[name=appointment-time]').first().focus();await page.keyboard.press('Space');await next(page,4);await personalize(page);await next(page,5);
   await page.getByRole('button',{name:'Preview Confirmation',exact:false}).focus();await page.keyboard.press('Enter');await page.locator('#booking-complete-title').waitFor();
-  results.push({name:'interaction-checks',contextualServices:5,focusTrap:true,discardAndFreshReopen:true,keyboardSelectionAndCalendar:true,reducedMotion:true});
+  results.push({name:'interaction-checks',desktopNavigation:true,servicesOverview:true,events:true,mobileNavigation:true,contextualServices:5,focusTrap:true,discardAndFreshReopen:true,keyboardSelectionAndCalendar:true,reducedMotion:true});
   // A reduced visual viewport while editing keeps the focused field and footer usable.
   await page.getByRole('button',{name:'Back to Blissed',exact:false}).click();await open(page);await selectService(page,'reset');await next(page,1);await next(page,2);await page.locator('#booking-address').focus();await page.setViewportSize({width:390,height:450});await page.waitForTimeout(100);await inspect(page,'390-keyboard-resize');assert.ok(await page.locator('.booking-dialog').evaluate(e=>e.hasAttribute('data-keyboard-open')));await capture(page,'390-keyboard-resize');
   await page.close();

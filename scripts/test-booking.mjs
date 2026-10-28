@@ -15,7 +15,7 @@ try {
   if (diagnostics.length) { console.error(ts.formatDiagnosticsWithColorAndContext(diagnostics, { getCanonicalFileName: name => name, getCurrentDirectory: () => process.cwd(), getNewLine: () => '\n' })); process.exitCode = 1; }
   else {
     program.emit();
-    const result = spawnSync(process.execPath, ['--test', 'tests/booking.test.cjs'], { stdio: 'inherit', env: { ...process.env, BOOKING_TEST_BUILD: output } });
+    const result = spawnSync(process.execPath, ['--test', 'tests/booking.test.cjs', 'tests/booking-preview.test.mjs'], { stdio: 'inherit', env: { ...process.env, BOOKING_TEST_BUILD: output } });
     process.exitCode = result.status ?? 1;
   }
 } finally { rmSync(output, { recursive: true, force: true }); }

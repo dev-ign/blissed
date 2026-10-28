@@ -65,7 +65,7 @@ export default function App() {
       <Footer />
       </div>
       {bookingEntry && <Suspense fallback={<div className="booking-notice" role="status">Opening your booking preview…</div>}><BookingDialog entry={bookingEntry} onClose={() => setBookingEntry(null)} returnFocus={bookingTrigger.current} /></Suspense>}
-      {bookingNotice && <div className="booking-notice" role="status">Online booking is coming soon.</div>}
+      {bookingNotice && <div className="booking-notice" role="status">The booking preview is currently unavailable. Please try again later.</div>}
     </>
   );
 }
